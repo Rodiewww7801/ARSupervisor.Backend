@@ -1,0 +1,19 @@
+{
+  "name": "arsupervisor.mqttbroker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "NODE_ENV=dev node app.js",
+    "start": "node app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aedes": "^0.51.3",
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "websocket-stream": "^5.5.2"
+  }
+}
