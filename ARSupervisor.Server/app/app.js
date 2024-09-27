@@ -10,7 +10,7 @@ process.nativeApps = [config.CLIENT_ID_IOS];
 
 database.createDatabaseIfNeeded(async () => {
 	const grants =  ['password', 'client_credentials'];
-	await Client.createClient(config.CLIENT_ID_IOS,  config.CLIENT_ID_IOS, crypto.randomUUID().toString(), grants);
+	await Client.createClient('ARSupervisor.IOS', 'ARSupervisor.IOS', crypto.randomUUID().toString(), grants);
 	await Client.createClient('Web', 'Web', crypto.randomUUID().toString(), grants);
 });
 
