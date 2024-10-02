@@ -18,7 +18,7 @@ exports.up = function (knex) {
 			table.string('id', 50)
 				.notNullable()
 				.primary();
-			table.string('username', 255)
+			table.string('email', 255)
 				.notNullable();
 			table.string('hashedPassword', 255);
 		})

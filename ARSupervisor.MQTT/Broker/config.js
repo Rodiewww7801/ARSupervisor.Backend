@@ -9,6 +9,5 @@ if (process.env.NODE_ENV) {
 
 module.exports = {
 	PORT: process.env.PORT,
-	HOST: process.env.HOST,
-	AUTH_SERVER_URL: process.env.AUTH_SERVER_URL,
+	BACKEND_URL: process.env.BACKEND_URL,
 };

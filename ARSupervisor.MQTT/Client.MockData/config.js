@@ -10,5 +10,5 @@ if (process.env.NODE_ENV) {
 module.exports = {
 	BROKER_PORT: process.env.BROKER_PORT,
 	BROKER_HOST: process.env.BROKER_HOST,
-	AUTH_SERVER_URL: process.env.AUTH_SERVER_URL,
+	BACKEND_URL: process.env.BACKEND_URL,
 };

@@ -1,4 +1,4 @@
-const { UserAllreadyExist } = require("../../../domain/errors/index.js");
+const { UserAllreadyExist, UserDosentExist } = require("../../../domain/errors/index.js");
 const { ValidationError, HTTPError } = require("../../errors/index.js");
 
 function authController(sessionService) {
@@ -6,20 +6,20 @@ function authController(sessionService) {
 		if (err instanceof HTTPError) {
 			const statusCode = err.statusCode;
 			res.status(statusCode).json({ message: err.message });
-		} else if (err instanceof UserAllreadyExist) {
-			res.status(404).json({ message: err.message });
+		} else if (err instanceof UserAllreadyExist || err instanceof UserDosentExist) {
+			res.status(400).json({ message: err.message });
 		} else {
 			res.status(404).json({ message: 'Invalid request' });
 		}
 	}
 
 
-	async function handleSignup(req, res) {
+	async function handleRegister(req, res) {
 		try {
-			const { username, password } = req.body;
+			const { email, password } = req.body;
 			const clientId = req.header('Client') ?? 'Web';
-			const user = await sessionService.signupSession(username, password, clientId);
-			sendTokenResponse(res, user.session)
+			await sessionService.registerUser(email, password, clientId);
+			res.status(200).json({ message: 'Registration is successfull' });
 		} catch (err) {
 			handleError(err, res)
 		}
@@ -27,10 +27,18 @@ function authController(sessionService) {
 
 	async function handleLogin(req, res) {
 		try {
-			const { username, password } = req.body;
+			const { email, password } = req.body;
 			const clientId = req.header('Client') ?? 'Web';
-			const session = await sessionService.loginSession(username, password, clientId);
-			sendTokenResponse(res, session);
+			const session = await sessionService.loginUser(email, password, clientId);
+			if (process.nativeApps.includes(session.clientId)) {
+				res.status(200).json({
+					accessToken: session.accessToken,
+					refreshToken: session.refreshToken
+				});
+			} else {
+				setSessionToCookie(res, session)
+				res.status(200).json({ message: 'Authenticated successfully' });
+			}
 		} catch (err) {
 			handleError(err, res)
 		}
@@ -43,36 +51,36 @@ function authController(sessionService) {
 			if (!refreshToken) {
 				throw new ValidationError(400, 'Refresh token required')
 			}
-			const newSession = await sessionService.refreshSession(refreshToken);
-			sendTokenResponse(res, newSession);
+			const newSession = await sessionService.refreshSession(refreshToken, clientId);
+			if (process.nativeApps.includes(session.clientId)) {
+				res.status(200).json({
+					accessToken: session.accessToken,
+					refreshToken: session.refreshToken
+				});
+			} else {
+				setSessionToCookie(res, newSession);
+				res.status(200).json({ message: 'Session is refreshed successfully' });
+			}
 		} catch (err) {
 			handleError(err, res)
 		}
 	}
 
-	function sendTokenResponse(res, session) {
-		if (process.nativeApps.includes(session.clientId)) {
-			res.status(200).json({
-				accessToken: session.accessToken,
-				refreshToken: session.refreshToken
-			});
-		} else {
-			res.cookie('accessToken', session.accessToken, {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === 'prod',
-				sameSite: 'Strict'
-			});
-			res.cookie('refreshToken', session.refreshToken, {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === 'prod',
-				sameSite: 'Strict'
-			});
-			res.status(200).json({ message: 'Authentication successful' });
-		}
+	function setSessionToCookie(res, session) {
+		res.cookie('accessToken', session.accessToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'prod',
+			sameSite: 'Strict'
+		});
+		res.cookie('refreshToken', session.refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === 'prod',
+			sameSite: 'Strict'
+		});
 	}
 
 	return Object.freeze({
-		handleSignup,
+		handleRegister,
 		handleLogin,
 		handleRefresh
 	})

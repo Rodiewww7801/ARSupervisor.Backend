@@ -1,32 +1,32 @@
-const { UserAllreadyExist } = require('../errors/index.js');
+const { UserAllreadyExist, UserDosentExist } = require('../errors/index.js');
 
 function User(userRepository, passwordService) {
-	async function createUser(username, password) {
+	async function createUser(email, password) {
 		const hashedPassword = await passwordService.hashPassword(password);
 		const id = crypto.randomUUID().toString();
-		const isUserExist = await userRepository.getUserByUsername(username);
+		const isUserExist = await userRepository.getUserByEmail(email);
 		if (isUserExist) {
-			throw new UserAllreadyExist(username);
+			throw new UserAllreadyExist(email);
 		}
-		const user = await userRepository.addUser(id, username, hashedPassword);
+		const user = await userRepository.addUser(id, email, hashedPassword);
 		if(!user) {
 			return null;
 		}
 		return {
 			id: user.id,
-			username: user.username,
+			email: user.email,
 			hashedPassword: user.hashedPassword
 		};
 	}
 
-	async function getUserByUsername(username) {
-		const user = await userRepository.getUserByUsername(username);
+	async function getUserByEmail(email) {
+		const user = await userRepository.getUserByEmail(email);
 		if(!user) {
-			return null;
+			throw new UserDosentExist(email);
 		}
 		return {
 			id: user.id,
-			username: user.username,
+			email: user.email,
 			hashedPassword: user.hashedPassword
 		};
 	}
@@ -38,7 +38,7 @@ function User(userRepository, passwordService) {
 
 	return {
 		createUser,
-		getUserByUsername,
+		getUserByEmail,
 		verifyPassword
 	}
 }

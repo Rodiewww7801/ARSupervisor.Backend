@@ -6,7 +6,7 @@ const { authRoutes,  secretRoutes } = require('./routes/index.js');
 const { Client } = require('./domain/index.js'); 
 const database = require('./database/database.js')
 
-process.nativeApps = [config.CLIENT_ID_IOS];
+process.nativeApps = ['ARSupervisor.IOS'];
 
 database.createDatabaseIfNeeded(async () => {
 	const grants =  ['password', 'client_credentials'];
@@ -24,5 +24,5 @@ app.use(secretRoutes);
 
 app.listen(PORT, () => {
 	const IPv4 = getIPAddress();
-	console.log('Server: listening on http://%s:%s', IPv4, PORT)
+	console.log('Server:\t\t\t listening on http://%s:%s', IPv4, PORT)
 });

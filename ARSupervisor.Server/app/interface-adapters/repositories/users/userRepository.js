@@ -3,12 +3,12 @@ const db = require('../../../database/database.js');
 const knex = db.knex
 
 function repository() {
-	async function addUser(id, username, hashedPassword) {
+	async function addUser(id, email, hashedPassword) {
 		try {
 			return await knex('users')
 				.insert({
 					id: id,
-					username: username,
+					email: email,
 					hashedPassword: hashedPassword,
 				})
 				.onConflict('id')
@@ -20,11 +20,11 @@ function repository() {
 		}
 	}
 
-	async function getUserByUsername(username) {
+	async function getUserByEmail(email) {
 		try {
 			return await knex('users')
 				.where({
-					username: username,
+					email: email,
 				})
 				.returning('*')
 				.then(rows => rows[0]); 
@@ -35,7 +35,7 @@ function repository() {
 
 	return Object.freeze({
 		addUser,
-		getUserByUsername
+		getUserByEmail
 	})
 }
 

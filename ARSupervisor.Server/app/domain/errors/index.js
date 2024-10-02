@@ -5,13 +5,22 @@ class DomainError extends Error {
 }
 
 class UserAllreadyExist extends DomainError {
-	constructor(username) {
-		super(`User '${username}' allready exist`);
-		this.username = username;
+	constructor(email) {
+		super(`User '${email}' allready exist`);
+		this.email = email;
 	}
- }
+}
+
+class UserDosentExist extends DomainError {
+	constructor(email) {
+		super(`User '${email}' dosen't exist`);
+		this.email = email;
+	}
+}
+
 
 module.exports = {
 	DomainError,
+	UserDosentExist,
 	UserAllreadyExist
 };

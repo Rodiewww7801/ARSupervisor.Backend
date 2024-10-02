@@ -1,28 +1,25 @@
 const { ValidationError } = require('../../errors/index.js');
 
 function sessionService(User, Session) {
-	async function signupSession(username, password, clientId) {
-		if(!username, !password, !clientId) {
+	async function registerUser(email, password, clientId) {
+		if(!email, !password, !clientId) {
 			throw new ValidationError()
 		}
-		const user = await User.createUser(username, password);
-		const session = await Session.createSession(clientId, user.id);
-		return { ...user, session };
+		const user = await User.createUser(email, password);
+		return user;
 	}
 
-	async function loginSession(username, password, clientId) {
-		if(!username, !password, !clientId) {
+	async function loginUser(email, password, clientId) {
+		if(!email, !password, !clientId) {
 			throw new ValidationError()
 		}
-		const user = await User.getUserByUsername(username);
+		const user = await User.getUserByEmail(email);
 		const verifiedPassword = await User.verifyPassword(password, user.hashedPassword);
 		if (!user || !verifiedPassword) {
 			throw new ValidationError();
 		}
 		return await Session.createSession(clientId, user.id);;
 	}
-
-
 
 	function validateToken(decodedToken, session) {
 		if(!decodedToken, !session) {
@@ -37,11 +34,14 @@ function sessionService(User, Session) {
 		return true
 	}
 
-	async function refreshSession(refreshToken) {
+	async function refreshSession(refreshToken, clientId) {
 		if(!refreshToken) {
 			throw new ValidationError()
 		}
 		const decodedJWT = await Session.verifyTokenSign(refreshToken)
+		if (decodedJWT.clientId != clientId) {
+			throw new ValidationError();
+		}
 		const session = await Session.getSessionByRefreshToken(refreshToken);
 		if (!validateToken(decodedJWT, session)) {
 			throw new ValidationError();
@@ -50,8 +50,8 @@ function sessionService(User, Session) {
 	}
 
 	return Object.freeze({
-		loginSession,
-		signupSession,
+		loginUser,
+		registerUser,
 		refreshSession,
 	});
 }

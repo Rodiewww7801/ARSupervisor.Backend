@@ -26,11 +26,11 @@ const createDatabaseIfNeeded = async function (completion) {
 	try {
 		const result = await knexSystem.raw(`SELECT 1 FROM pg_database WHERE datname = '${dbName}'`);
 		if (result.rows.length === 0) {
-			console.log(`Database: ${dbName} not found, creating...`);
+			console.log(`Database:\t\t ${dbName} not found, creating...`);
 			await knexSystem.raw(`CREATE DATABASE ${dbName}`);
-			console.log(`Database: ${dbName} created successfully.`);
+			console.log(`Database:\t\t ${dbName} created successfully.`);
 		} else {
-			console.log(`Database: ${dbName} already exists.`);
+			console.log(`Database:\t\t ${dbName} already exists.`);
 		}
 		await runMigrations();
 		completion();
@@ -43,9 +43,9 @@ const createDatabaseIfNeeded = async function (completion) {
 
 async function runMigrations() {
 	try {
-		console.log(`Running migrations on ${dbName}...`);
+		console.log(`Database:\t\t Running migrations on ${dbName}...`);
 		await knex.migrate.latest(migrationConfig);
-		console.log(`Migrations for ${dbName} completed successfully.`);
+		console.log(`Database:\t\t Migrations for ${dbName} completed successfully.`);
 	} catch (err) {
 		throw new DatabaseError(err.message);
 	}
