@@ -1,3 +1,4 @@
+const { UnsupportedClient } = require("../../../domain-services/errors/index.js");
 const { UserAllreadyExist, UserDosentExist } = require("../../../domain/errors/index.js");
 const { ValidationError, HTTPError } = require("../../errors/index.js");
 
@@ -6,10 +7,13 @@ function authController(sessionService) {
 		if (err instanceof HTTPError) {
 			const statusCode = err.statusCode;
 			res.status(statusCode).json({ message: err.message });
-		} else if (err instanceof UserAllreadyExist || err instanceof UserDosentExist) {
+		} else if (
+			err instanceof UserAllreadyExist ||
+			err instanceof UserDosentExist ||
+		 	err instanceof UnsupportedClient) {
 			res.status(400).json({ message: err.message });
 		} else {
-			res.status(404).json({ message: 'Invalid request' });
+			res.status(400).json({ message: 'Invalid request' });
 		}
 	}
 
@@ -17,7 +21,7 @@ function authController(sessionService) {
 	async function handleRegister(req, res) {
 		try {
 			const { email, password } = req.body;
-			const clientId = req.header('Client') ?? 'Web';
+			const clientId = req.header('Client');
 			await sessionService.registerUser(email, password, clientId);
 			res.status(200).json({ message: 'Registration is successfull' });
 		} catch (err) {
@@ -28,7 +32,7 @@ function authController(sessionService) {
 	async function handleLogin(req, res) {
 		try {
 			const { email, password } = req.body;
-			const clientId = req.header('Client') ?? 'Web';
+			const clientId = req.header('Client');
 			const session = await sessionService.loginUser(email, password, clientId);
 			if (process.nativeApps.includes(session.clientId)) {
 				res.status(200).json({
@@ -46,7 +50,7 @@ function authController(sessionService) {
 
 	async function handleRefresh(req, res) {
 		try {
-			const clientId = req.header('Client') ?? 'Web';
+			const clientId = req.header('Client');
 			let refreshToken = req.body.refreshToken || req.cookies.refreshToken;;
 			if (!refreshToken) {
 				throw new ValidationError(400, 'Refresh token required')

@@ -5,7 +5,7 @@ const mqtt = require('mqtt');
 const HOST = config.BROKER_HOST;
 const PORT = config.BROKER_PORT;
 const BACKEND_URL = config.BACKEND_URL;
-const clientId = 'MQTT.Client.MockData'
+const clientId = 'MQTT.Client'
 const email = 'MQTT.Client.MockData@evil.corp.mail'
 const password = '123'
 
@@ -14,6 +14,11 @@ async function registerClient() {
     response =  await axios.post(`${BACKEND_URL}/api/authentication/register`, {
       email: email,
       password: password
+    }, {
+      headers: {
+        'Client': clientId,
+        'Content-Type': 'application/json',
+      }
     });
     console.log(`MQTT.Client.MockData:\t successfully register client with message: ${response?.data?.message}`)
   } catch (err) {
@@ -28,6 +33,11 @@ async function loginClient() {
     response =  await axios.post(`${BACKEND_URL}/api/authentication/login`, {
       email: email,
       password: password
+    }, {
+      headers: {
+        'Client': clientId,
+        'Content-Type': 'application/json',
+      }
     });
     console.log(`MQTT.Client.MockData:\t successfully login client with message: ${response?.data?.message}`)
   } catch (err) {
@@ -62,6 +72,10 @@ async function start() {
       //client.end(); // Close the connection
     });
   });
+
+  client.on('error', (err) => {
+    console.log('MQTT.Client.MockData:\t ', err);
+});
 }
 
 setTimeout( () => {

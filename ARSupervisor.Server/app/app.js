@@ -8,13 +8,17 @@ const database = require('./database/database.js')
 
 process.nativeApps = ['ARSupervisor.IOS'];
 
+async function addClients() {
+	await Client.createClient('ARSupervisor.IOS', 'ARSupervisor.IOS', crypto.randomUUID().toString(), ['password']);
+	await Client.createClient('Postman', 'Postman', crypto.randomUUID().toString(), ['password']);
+	await Client.createClient('MQTT.Client', 'MQTT.Client', crypto.randomUUID().toString(), ['client_credentials']);
+}
+
 database.createDatabaseIfNeeded(async () => {
-	const grants =  ['password', 'client_credentials'];
-	await Client.createClient('ARSupervisor.IOS', 'ARSupervisor.IOS', crypto.randomUUID().toString(), grants);
-	await Client.createClient('Web', 'Web', crypto.randomUUID().toString(), grants);
+	await addClients();
 });
 
-const PORT = 8080;
+const PORT = config.PORT;
 const app = express();
 
 app.use(express.json());

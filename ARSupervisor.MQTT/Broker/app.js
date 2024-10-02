@@ -18,6 +18,11 @@ aedes.authenticate = async (client, username, password, callback) => {
 		const response = await axios.post(`${BACKEND_URL}/api/authentication/login`, {
 			email: username,
 			password: password.toString()
+		}, {
+			headers: {
+			  'Client': client.id,
+			  'Content-Type': 'application/json',
+			}
 		});
 
 		if (response.status == 200) {

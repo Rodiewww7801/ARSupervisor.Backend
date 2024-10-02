@@ -1,9 +1,13 @@
-const { ValidationError } = require('../../errors/index.js');
+const { ValidationError, UnsupportedClient } = require('../../errors/index.js');
 
-function sessionService(User, Session) {
+function sessionService(User, Session, Client) {
 	async function registerUser(email, password, clientId) {
 		if(!email, !password, !clientId) {
 			throw new ValidationError()
+		}
+		const isClientExist = await Client.getClientById(clientId);
+		if (!isClientExist) {
+			throw new UnsupportedClient()
 		}
 		const user = await User.createUser(email, password);
 		return user;
@@ -12,6 +16,10 @@ function sessionService(User, Session) {
 	async function loginUser(email, password, clientId) {
 		if(!email, !password, !clientId) {
 			throw new ValidationError()
+		}
+		const isClientExist = await Client.getClientById(clientId);
+		if (!isClientExist) {
+			throw new UnsupportedClient()
 		}
 		const user = await User.getUserByEmail(email);
 		const verifiedPassword = await User.verifyPassword(password, user.hashedPassword);
@@ -37,6 +45,10 @@ function sessionService(User, Session) {
 	async function refreshSession(refreshToken, clientId) {
 		if(!refreshToken) {
 			throw new ValidationError()
+		}
+		const isClientExist = await Client.getClientById(clientId);
+		if (!isClientExist) {
+			throw new UnsupportedClient()
 		}
 		const decodedJWT = await Session.verifyTokenSign(refreshToken)
 		if (decodedJWT.clientId != clientId) {
