@@ -1,4 +1,6 @@
 const config = require('./config.js')
+const LoggerObj = require('../../CustomLogger/Logger.js');
+const Logger = new LoggerObj('API.Server')
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const { getIPAddress } = require('./helpers/index.js');
@@ -28,5 +30,5 @@ app.use(secretRoutes);
 
 app.listen(PORT, () => {
 	const IPv4 = getIPAddress();
-	console.log('Server:\t\t\t listening on http://%s:%s', IPv4, PORT)
+	Logger.log(`listening on http://${IPv4}:${PORT}`);
 });

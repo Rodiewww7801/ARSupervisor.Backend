@@ -4,6 +4,8 @@
 // I think it will be rewritten to a cluster approach in the future.
 
 const config = require('./config.js');
+const LoggerObj = require('../../CustomLogger/Logger.js');
+const Logger = new LoggerObj('MQTT.Broker');
 const axios = require('axios');
 const aedes = require('aedes')({ id: 'BROKER_1' });
 const server = require('http').createServer()
@@ -31,6 +33,7 @@ aedes.authenticate = async (client, username, password, callback) => {
 			callback(new Error('Authentification failed'), false);
 		}
 	} catch (err) {
+		Logger.logError(`${err}`)
 		callback(new Error(err.message), false);
 	}
 }
@@ -38,33 +41,33 @@ aedes.authenticate = async (client, username, password, callback) => {
 ws.createServer({ server: server }, aedes.handle)
 
 server.listen(PORT, HOST, function () {
-	console.log('MQTT.Broker:\t\t listening on ws://%s:%s ', HOST, PORT);
+	Logger.logInfo(`listening on ws://${HOST}:${PORT}`);
 	//aedes.publish({ topic: 'welcome/hello', payload: "I'm broker " + aedes.id });
 });
 
 server.on('error', function (err) {
-	console.log('MQTT.Broker:\t\t Server error', err);
+	Logger.logError(`${err}`);
 	process.exit(1);
 });
 
 aedes.on('subscribe', function (subscriptions, client) {
-	console.log('MQTT.Broker:\t\t Client ' + (client ? client.id : client) +
-		'subscribed to topics: ' + subscriptions.map(s => s.topic).join('\n'), 'from broker', aedes.id);
+	Logger.log('Client ' + (client ? client.id : client) +
+		'subscribed to topics: ' + subscriptions.map(s => s.topic).join('\n') + ' from broker ' + aedes.id);
 });
 
 aedes.on('unsubscribe', function (subscriptions, client) {
-	console.log('MQTT.Broker:\t\t Client ' + (client ? client.id : client) +
-		'unsubscribed to topics: ' + subscriptions.join('\n'), 'from broker', aedes.id);
+	Logger.log('Client ' + (client ? client.id : client) +
+		'unsubscribed to topics: ' + subscriptions.join('\n') + ' from broker ' + aedes.id);
 });
 
 // fired when a client connects
 aedes.on('client', function (client) {
-	console.log('MQTT.Broker:\t\t Client Connected: ' + (client ? client.id : client), 'to broker', aedes.id);
+	Logger.log('Client Connected: ' + (client ? client.id : client) + ' to broker ' + aedes.id);
 });
 
 // fired when a client disconnects
 aedes.on('clientDisconnect', function (client) {
-	console.log('MQTT.Broker:\t\t Client Disconnected: ' + (client ? client.id : client), 'to broker', aedes.id);
+	Logger.log('Client Disconnected: ' + (client ? client.id : client) + ' to broker ' + aedes.id);
 });
 
 // fired when a message is published
@@ -72,5 +75,5 @@ aedes.on('publish', async function (packet, client) {
 	if (packet.topic == `$SYS/${aedes.id}/heartbeat`) {
 		return;
 	}
-	console.log('MQTT.Broker:\t\t Client ' + (client ? client.id : aedes.id) + ' has published', packet.payload.toString(), 'on', packet.topic, 'to broker', aedes.id);
+	Logger.log('Client ' + (client ? client.id : aedes.id) + ' has published ' + packet.payload.toString() + 'on ' + packet.topic + ' to broker ' + aedes.id);
 });

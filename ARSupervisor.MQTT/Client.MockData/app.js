@@ -2,6 +2,8 @@ const config = require('./config.js');
 
 const axios = require('axios');
 const mqtt = require('mqtt');
+const LoggerObj = require('../../CustomLogger/Logger.js');
+const Logger = new LoggerObj('MQTT.MockData');
 const HOST = config.BROKER_HOST;
 const PORT = config.BROKER_PORT;
 const BACKEND_URL = config.BACKEND_URL;
@@ -20,10 +22,10 @@ async function registerClient() {
         'Content-Type': 'application/json',
       }
     });
-    console.log(`MQTT.Client.MockData:\t successfully register client with message: ${response?.data?.message}`)
+    Logger.log(`successfully register client with message: ${response?.data?.message}`)
   } catch (err) {
     const message = err?.response?.data?.message || err.message;
-    console.log('MQTT.Client.MockData:\t failed to register request with message: ', message);
+    Logger.log(`failed to register request with message: ${message}`);
     throw err
   }
 }
@@ -39,10 +41,10 @@ async function loginClient() {
         'Content-Type': 'application/json',
       }
     });
-    console.log(`MQTT.Client.MockData:\t successfully login client with message: ${response?.data?.message}`)
+    Logger.log(`successfully login client with message: ${response?.data?.message}`)
   } catch (err) {
     const message = err?.response?.data?.message || err.message;
-    console.log('MQTT.Client.MockData:\t failed to login request with message: ', message);
+    Logger.logError(`failed to login request with message: ${message}`);
     throw err
   }
 }
@@ -51,12 +53,12 @@ async function start() {
   try {
     await loginClient();
   } catch {
-    console.log(`MQTT.Client.MockData:\t try to register client '${clientId}'`);
+    Logger.log(`try to register client '${clientId}'`);
     try {
       await registerClient();
       await loginClient();
     } catch {
-      console.log(`MQTT.Client.MockData:\t failed to authentifacate client '${clientId} execute with error'`);
+      Logger.logError(`failed to authentifacate client '${clientId} execute with error'`);
       return 
     }
   }
@@ -67,14 +69,14 @@ async function start() {
   });
 
   client.on('connect', function () {
-    console.log('MQTT.Client.MockData:\t connected to broker');
+    Logger.log('connected to broker');
     client.publish('test/topic', 'Hello MQTT !', function () {
       //client.end(); // Close the connection
     });
   });
 
   client.on('error', (err) => {
-    console.log('MQTT.Client.MockData:\t ', err);
+    Logger.logError(`${err}`);
 });
 }
 
