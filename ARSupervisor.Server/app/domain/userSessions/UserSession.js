@@ -1,8 +1,7 @@
-function UserSession(userSessionRepository, tokenService, Role) {
-	async function createUserSession(clientId, userId) {
+function UserSession(userSessionRepository, Role) {
+	async function createUserSession(clientId, userId, accessToken, refreshToken) {
 		let role = await Role.getRoleById(userId);
 		role = role ?? 'user';
-		const { accessToken, refreshToken } = tokenService.generateTokens(clientId, userId, role);
 		const userSession = await userSessionRepository.addUserSession(accessToken, refreshToken, clientId, userId);
 		if(!userSession) {
 			return null;
@@ -44,13 +43,8 @@ function UserSession(userSessionRepository, tokenService, Role) {
 		};
 	}
 
-	async function verifyTokenSign(token) {
-		return await tokenService.verifyTokenSign(token);
-	}
-
 	return {
 		createUserSession,
-		verifyTokenSign,
 		getUserSessionByAccessToken,
 		getUserSessionByRefreshToken,
 	}

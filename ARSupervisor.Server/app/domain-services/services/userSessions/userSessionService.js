@@ -1,6 +1,6 @@
 const { ValidationError, UnsupportedClient } = require('../../errors/index.js');
 
-function userSessionService(User, UserSession, Client) {
+function userSessionService(User, UserSession, Client, tokenService) {
 	async function registerUser(email, password, clientId) {
 		if(!email, !password, !clientId) {
 			throw new ValidationError()
@@ -26,7 +26,9 @@ function userSessionService(User, UserSession, Client) {
 		if (!user || !verifiedPassword) {
 			throw new ValidationError();
 		}
-		return await UserSession.createUserSession(clientId, user.id);;
+
+		const { accessToken, refreshToken } = tokenService.generateTokens(clientId, user.id, role);
+		return await UserSession.createUserSession(clientId, user.id, accessToken, refreshToken);;
 	}
 
 	function validateToken(decodedToken, userSession) {
@@ -50,7 +52,7 @@ function userSessionService(User, UserSession, Client) {
 		if (!isClientExist) {
 			throw new UnsupportedClient()
 		}
-		const decodedJWT = await UserSession.verifyTokenSign(refreshToken)
+		const decodedJWT = await tokenService.verifyTokenSign(refreshToken)
 		if (decodedJWT.clientId != clientId) {
 			throw new ValidationError();
 		}
@@ -58,7 +60,8 @@ function userSessionService(User, UserSession, Client) {
 		if (!validateToken(decodedJWT, userSession)) {
 			throw new ValidationError();
 		}
-		return await UserSession.createUserSession(userSession.clientId, userSession.userId);
+		const { accessToken, newRefreshToken } = tokenService.generateTokens(userSession.clientId, userSession.userId, role);
+		return await UserSession.createUserSession(userSession.clientId, userSession.userId, accessToken, newRefreshToken);
 	}
 
 	return Object.freeze({

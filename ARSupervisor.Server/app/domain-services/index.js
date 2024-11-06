@@ -7,7 +7,7 @@ function bootstraper() {
 
 	const passwordService = passwordServiceFactory();
 	const tokenService = tokenServiceFactory();
-	const userSessionService = userSessionServiceFactory(User, UserSession, Client);
+	const userSessionService = userSessionServiceFactory(User, UserSession, Client, tokenService);
 
 	return {
 		passwordService,
