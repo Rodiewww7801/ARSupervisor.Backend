@@ -1,25 +1,25 @@
 const userFactory = require('./users/User');
-const clientFactory = require('./sessions/Client');
-const sessionFactory = require('./sessions/Session');
-const roleFactory = require('./sessions/Role');
+const clientFactory = require('./userSessions/Client');
+const userSessionFactory = require('./userSessions/UserSession');
+const roleFactory = require('./userSessions/Role');
 
 const {
 	userRepository,
 	clientRepository,
-	sessionRepository,
+	userSessionRepository,
 	roleRepository } = require('../interface-adapters/repositories/index.js');
 
-const passwordService = require('../domain-services/services/sessions/passwordService.js');
-const tokenService = require('../domain-services/services/sessions/tokenService.js')
+const passwordService = require('../domain-services/services/userSessions/passwordService.js');
+const tokenService = require('../domain-services/services/userSessions/tokenService.js')
 
 const User = userFactory(userRepository, passwordService());
 const Client = clientFactory(clientRepository);
 const Role = roleFactory(roleRepository);
-const Session = sessionFactory(sessionRepository, tokenService(), Role);
+const UserSession = userSessionFactory(userSessionRepository, tokenService(), Role);
 
 module.exports = {
 	User,
 	Client,
-	Session,
+	UserSession,
 	Role,
 }

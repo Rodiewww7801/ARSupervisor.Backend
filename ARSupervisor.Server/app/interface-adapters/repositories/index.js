@@ -1,11 +1,12 @@
-const clientRepository = require('./sessions/clientRepository');
-const roleRepository = require('./sessions/roleRepository');
-const sessionRepository = require('./sessions/sessionRepository');
-const userRepository = require('./users/userRepository');
+const clientRepository = require('./clientRepository');
+const roleRepository = require('./roleRepository');
+const userSessionRepository = require('./userSessionRepository');
+const userRepository = require('./userRepository');
+const assetSessionRepository = require('./assetsSessionRepository.js')
 
 module.exports = {
 	clientRepository,
 	roleRepository,
-	sessionRepository,
+	userSessionRepository,
 	userRepository
 }

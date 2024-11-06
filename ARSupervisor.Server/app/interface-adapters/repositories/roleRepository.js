@@ -1,5 +1,5 @@
-const { DatabaseError } = require('../../errors/index.js');
-const db = require('../../../database/database.js');
+const { DatabaseError } = require('../errors/index.js');
+const db = require('../../database/database.js');
 const knex = db.knex
 
 function repository() {

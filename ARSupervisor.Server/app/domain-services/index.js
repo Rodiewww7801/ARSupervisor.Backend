@@ -1,17 +1,17 @@
 function bootstraper() {
-	const passwordServiceFactory = require('./services/sessions/passwordService.js');
-	const tokenServiceFactory = require('./services/sessions/tokenService.js');
-	const sessionServiceFactory = require('./services/sessions/sessionService.js');
+	const passwordServiceFactory = require('./services/userSessions/passwordService.js');
+	const tokenServiceFactory = require('./services/userSessions/tokenService.js');
+	const userSessionServiceFactory = require('./services/userSessions/userSessionService.js');
 	
-	const { User, Session, Client } = require('../domain/index.js');
+	const { User, UserSession, Client } = require('../domain/index.js');
 
 	const passwordService = passwordServiceFactory();
 	const tokenService = tokenServiceFactory();
-	const sessionService = sessionServiceFactory(User, Session, Client);
+	const userSessionService = userSessionServiceFactory(User, UserSession, Client);
 
 	return {
 		passwordService,
-		sessionService,
+		userSessionService,
 		tokenService
 	};
 }

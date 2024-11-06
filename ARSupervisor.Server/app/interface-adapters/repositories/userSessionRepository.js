@@ -1,11 +1,11 @@
-const { DatabaseError } = require('../../errors/index.js');
-const db = require('../../../database/database.js');
+const { DatabaseError } = require('../errors/index.js');
+const db = require('../../database/database.js');
 const knex = db.knex
 
 function repository() {
-	async function addSession(accessToken, refreshToken, clientId, userId, isRevoked) {
+	async function addUserSession(accessToken, refreshToken, clientId, userId, isRevoked) {
 		try {
-			return await knex('sessions')
+			return await knex('userSessions')
 				.insert({
 					accessToken: accessToken,
 					refreshToken: refreshToken,
@@ -22,9 +22,9 @@ function repository() {
 		}
 	}
 
-	async function getSessionByAccessToken(accessToken) {
+	async function getUserSessionByAccessToken(accessToken) {
 		try {
-			return await knex('sessions')
+			return await knex('userSession')
 				.where({
 					accessToken: accessToken
 				})
@@ -35,9 +35,9 @@ function repository() {
 		}
 	}
 
-	async function getSessionByRefreshToken(refreshToken) {
+	async function getUserSessionByRefreshToken(refreshToken) {
 		try {
-			return await knex('sessions')
+			return await knex('userSessions')
 				.where({
 					refreshToken: refreshToken
 				})
@@ -49,9 +49,9 @@ function repository() {
 	}
 
 	return Object.freeze({
-		addSession,
-		getSessionByAccessToken,
-		getSessionByRefreshToken
+		addUserSession,
+		getUserSessionByAccessToken,
+		getUserSessionByRefreshToken
 	})
 }
 

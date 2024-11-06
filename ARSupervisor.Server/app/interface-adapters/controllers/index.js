@@ -1,8 +1,8 @@
 const authControllerFactory = require('./auth/authController.js');
 
-const { sessionService } = require('../../domain-services/index.js')
+const { userSessionService } = require('../../domain-services/index.js')
 
-const authController = authControllerFactory(sessionService)
+const authController = authControllerFactory(userSessionService)
 
 module.exports = {
 	authController

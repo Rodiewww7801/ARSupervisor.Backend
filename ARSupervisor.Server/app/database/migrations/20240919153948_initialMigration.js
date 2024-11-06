@@ -22,7 +22,7 @@ exports.up = function (knex) {
 				.notNullable();
 			table.string('hashedPassword', 255);
 		})
-		.createTable('sessions', function (table) {
+		.createTable('userSessions', function (table) {
 			table.string('accessToken', 255)
 				.notNullable()
 				.unique();
@@ -68,6 +68,6 @@ exports.down = function (knex) {
 		.dropTable('users')
 		.dropTable('accessTokens')
 		.dropTable('refreshTokens')
-		.dropTable('sessions')
+		.dropTable('userSessions')
 		.dropTable('roles');
 };

@@ -1,6 +1,6 @@
 const httpHelper = require('../../helpers/httpHelpers.js');
 const { ValidationError, AuthenticationError, HTTPError } = require('../errors/index.js');
-const { Session } = require('../../domain/index.js')
+const { UserSession } = require('../../domain/index.js')
 
 function handleError(err, res) {
 	if(err instanceof HTTPError) {
@@ -18,7 +18,7 @@ async function auth (req, res, next) {
 			throw new ValidationError(401, 'Access token required');
 		}
 		try {
-			const decodedJWT = await Session.verifyTokenSign(accessToken);
+			const decodedJWT = await UserSession.verifyTokenSign(accessToken);
 			if (!decodedJWT) {
 				throw new AuthenticationError()
 			}

@@ -1,6 +1,6 @@
 const { ValidationError, UnsupportedClient } = require('../../errors/index.js');
 
-function sessionService(User, Session, Client) {
+function userSessionService(User, UserSession, Client) {
 	async function registerUser(email, password, clientId) {
 		if(!email, !password, !clientId) {
 			throw new ValidationError()
@@ -26,23 +26,23 @@ function sessionService(User, Session, Client) {
 		if (!user || !verifiedPassword) {
 			throw new ValidationError();
 		}
-		return await Session.createSession(clientId, user.id);;
+		return await UserSession.createUserSession(clientId, user.id);;
 	}
 
-	function validateToken(decodedToken, session) {
-		if(!decodedToken, !session) {
+	function validateToken(decodedToken, userSession) {
+		if(!decodedToken, !userSession) {
 			throw new ValidationError()
 		}
-		if (session.isRevoked ||
-			decodedToken.clientId !== session.clientId ||
-			decodedToken.userId !== session.userId) {
+		if (userSession.isRevoked ||
+			decodedToken.clientId !== userSession.clientId ||
+			decodedToken.userId !== userSession.userId) {
 			return false
 		}
 
 		return true
 	}
 
-	async function refreshSession(refreshToken, clientId) {
+	async function refreshUserSession(refreshToken, clientId) {
 		if(!refreshToken) {
 			throw new ValidationError()
 		}
@@ -50,22 +50,22 @@ function sessionService(User, Session, Client) {
 		if (!isClientExist) {
 			throw new UnsupportedClient()
 		}
-		const decodedJWT = await Session.verifyTokenSign(refreshToken)
+		const decodedJWT = await UserSession.verifyTokenSign(refreshToken)
 		if (decodedJWT.clientId != clientId) {
 			throw new ValidationError();
 		}
-		const session = await Session.getSessionByRefreshToken(refreshToken);
-		if (!validateToken(decodedJWT, session)) {
+		const userSession = await UserSession.getUserSessionByRefreshToken(refreshToken);
+		if (!validateToken(decodedJWT, userSession)) {
 			throw new ValidationError();
 		}
-		return await Session.createSession(session.clientId, session.userId);
+		return await UserSession.createUserSession(userSession.clientId, userSession.userId);
 	}
 
 	return Object.freeze({
 		loginUser,
 		registerUser,
-		refreshSession,
+		refreshUserSession,
 	});
 }
 
-module.exports = sessionService;
+module.exports = userSessionService;
