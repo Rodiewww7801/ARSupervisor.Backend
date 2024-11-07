@@ -3,8 +3,8 @@ function Logger(service){
 }
 
 Logger.prototype.formatLog = function(level, message) {
-    const timestamp = new Date().toISOString();
-    const paddedService = this.service;
+  const timestamp = new Date().toISOString();
+  const paddedService = this.service;
 	const spacer = "".padEnd(1)
 	const prefix = `[${timestamp}][${paddedService}][${level}]`.padEnd(50);
 	return `${prefix}${spacer}${message}`;

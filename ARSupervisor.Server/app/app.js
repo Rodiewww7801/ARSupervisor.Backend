@@ -1,6 +1,5 @@
 const config = require('./config.js')
-const LoggerObj = require('../../CustomLogger/Logger.js');
-const Logger = new LoggerObj('API.Server')
+const Logger = require('./helpers/logger.js')
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const { getIPAddress } = require('./helpers/index.js');

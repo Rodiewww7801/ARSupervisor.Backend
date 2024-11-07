@@ -1,6 +1,6 @@
 const { ValidationError, UnsupportedClient } = require('../../errors/index.js');
 
-function userSessionService(User, UserSession, Client, tokenService) {
+function userSessionService(User, UserSession, Client, Role, tokenService) {
 	async function registerUser(email, password, clientId) {
 		if(!email, !password, !clientId) {
 			throw new ValidationError()
@@ -27,6 +27,8 @@ function userSessionService(User, UserSession, Client, tokenService) {
 			throw new ValidationError();
 		}
 
+		let role = await Role.getRoleById(user.id);
+		role = role ?? 'user';
 		const { accessToken, refreshToken } = tokenService.generateTokens(clientId, user.id, role);
 		return await UserSession.createUserSession(clientId, user.id, accessToken, refreshToken);;
 	}
@@ -60,7 +62,9 @@ function userSessionService(User, UserSession, Client, tokenService) {
 		if (!validateToken(decodedJWT, userSession)) {
 			throw new ValidationError();
 		}
-		const { accessToken, newRefreshToken } = tokenService.generateTokens(userSession.clientId, userSession.userId, role);
+		let role = await Role.getRoleById(userSession.userId);
+		role = role ?? 'user';
+		const { accessToken, refreshToken: newRefreshToken } = tokenService.generateTokens(userSession.clientId, userSession.userId, role);
 		return await UserSession.createUserSession(userSession.clientId, userSession.userId, accessToken, newRefreshToken);
 	}
 

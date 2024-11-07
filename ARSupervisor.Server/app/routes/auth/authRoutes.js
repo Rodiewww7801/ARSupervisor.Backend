@@ -2,7 +2,7 @@ const { Router } = require('express');
 const { authController } = require('../../interface-adapters/controllers/index.js');
 
 const router = Router();
-const apiRoute = "/api/authentication"
+const apiRoute = "/api/auth"
 
 router.post(`${apiRoute}/register`, authController.handleRegister);
 router.post(`${apiRoute}/login`, authController.handleLogin);

@@ -1,7 +1,5 @@
 function UserSession(userSessionRepository, Role) {
 	async function createUserSession(clientId, userId, accessToken, refreshToken) {
-		let role = await Role.getRoleById(userId);
-		role = role ?? 'user';
 		const userSession = await userSessionRepository.addUserSession(accessToken, refreshToken, clientId, userId);
 		if(!userSession) {
 			return null;
