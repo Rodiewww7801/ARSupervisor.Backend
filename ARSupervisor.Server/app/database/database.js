@@ -1,59 +1,42 @@
 const { DatabaseError } = require('../interface-adapters/errors/index.js');
-const config = require('../config.js');
 const LoggerObj = require('../../../CustomLogger/Logger.js');
 const Logger = new LoggerObj('Database');
-const connectionString = `postgresql://${config.DB_USER}@${config.DB_HOST}:${config.DB_PORT}/${config.DB_NAME}?schema=public`
+const knexConfig = require('./knexfile');
+const knex = require('knex')(knexConfig);
 
-const knex = require('knex')({
-	client: 'pg',
-	connection: connectionString
-});
-
-const knexSystem = require('knex')({
-	client: 'pg',
-	connection: {
-		host: config.DB_HOST,
-		user: config.DB_USER,
-		database: 'postgres'
-	}
-});
-
-const dbName = config.DB_NAME;
-const migrationConfig = {
-	directory: __dirname + '/migrations',
-}
-
-const createDatabaseIfNeeded = async function (completion) {
-	try {
-		const result = await knexSystem.raw(`SELECT 1 FROM pg_database WHERE datname = '${dbName}'`);
-		if (result.rows.length === 0) {
-			Logger.log(`${dbName} not found, creating...`);
-			await knexSystem.raw(`CREATE DATABASE ${dbName}`);
-			Logger.log(`${dbName} created successfully.`);
-		} else {
-			Logger.log(`${dbName} already exists.`);
-		}
-		await runMigrations();
-		completion();
-	} catch (err) {
-		throw new DatabaseError(err.message);
-	} finally {
-		await knexSystem.destroy();
-	}
+const createDatabaseIfNeeded = async function () {
+  const _knexConfig = require('./knexfile');
+  const databaseName = _knexConfig.connection.database;
+  _knexConfig.connection.database = "postgres";
+  const _knex = require('knex')(_knexConfig);
+  try {
+    const result = await _knex.raw(`SELECT 1 FROM pg_database WHERE datname = '${databaseName}'`);
+    if (result.rows.length === 0) {
+      Logger.log(`${databaseName} not found, creating...`);
+      await _knex.raw(`CREATE DATABASE ${databaseName}`);
+      await runMigrations();
+      await knex.seed.run();
+      Logger.log(`${databaseName} created successfully.`);
+    } else {
+      await runMigrations();
+    }
+  } catch (err) {
+    throw new DatabaseError(err.message);
+  } finally {
+    await _knex.destroy();
+  }
 }
 
 async function runMigrations() {
-	try {
-		Logger.log(`Running migrations on ${dbName}...`);
-		await knex.migrate.latest(migrationConfig);
-		Logger.log(`Migrations for ${dbName} completed successfully.`);
-	} catch (err) {
-		throw new DatabaseError(err.message);
-	}
+  try {
+    Logger.log(`Running migrations...`);
+    await knex.migrate.latest();
+    Logger.log(`Migrations completed successfully.`);
+  } catch (err) {
+    throw new DatabaseError(err.message);
+  }
 }
 
+createDatabaseIfNeeded();
 
 exports.knex = knex;
-exports.knexSystem = knexSystem;
-exports.connectionString = connectionString
-exports.createDatabaseIfNeeded = createDatabaseIfNeeded;
