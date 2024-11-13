@@ -16,64 +16,64 @@ const BACKEND_URL = config.BACKEND_URL;
 
 
 aedes.authenticate = async (client, username, password, callback) => {
-	try {
-		const response = await axios.post(`${BACKEND_URL}/api/authentication/login`, {
-			email: username,
-			password: password.toString()
-		}, {
-			headers: {
-			  'Client': client.id,
-			  'Content-Type': 'application/json',
-			}
-		});
+  try {
+    const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
+      email: username,
+      password: password.toString()
+    }, {
+      headers: {
+        'Client': client.id,
+        'Content-Type': 'application/json',
+      }
+    });
 
-		if (response.status == 200) {
-			callback(null, true);
-		} else {
-			callback(new Error('Authentification failed'), false);
-		}
-	} catch (err) {
-		Logger.logError(`${err}`)
-		callback(new Error(err.message), false);
-	}
+    if (response.status == 200) {
+      callback(null, true);
+    } else {
+      callback(new Error('Authentification failed'), false);
+    }
+  } catch (err) {
+    Logger.logError(`${err}`)
+    callback(new Error(err.message), false);
+  }
 }
 
 ws.createServer({ server: server }, aedes.handle)
 
 server.listen(PORT, HOST, function () {
-	Logger.logInfo(`listening on ws://${HOST}:${PORT}`);
-	//aedes.publish({ topic: 'welcome/hello', payload: "I'm broker " + aedes.id });
+  Logger.logInfo(`listening on ws://${HOST}:${PORT}`);
+  //aedes.publish({ topic: 'welcome/hello', payload: "I'm broker " + aedes.id });
 });
 
 server.on('error', function (err) {
-	Logger.logError(`${err}`);
-	process.exit(1);
+  Logger.logError(`${err}`);
+  process.exit(1);
 });
 
 aedes.on('subscribe', function (subscriptions, client) {
-	Logger.log('Client ' + (client ? client.id : client) +
-		'subscribed to topics: ' + subscriptions.map(s => s.topic).join('\n') + ' from broker ' + aedes.id);
+  Logger.log('Client ' + (client ? client.id : client) +
+    'subscribed to topics: ' + subscriptions.map(s => s.topic).join('\n') + ' from broker ' + aedes.id);
 });
 
 aedes.on('unsubscribe', function (subscriptions, client) {
-	Logger.log('Client ' + (client ? client.id : client) +
-		'unsubscribed to topics: ' + subscriptions.join('\n') + ' from broker ' + aedes.id);
+  Logger.log('Client ' + (client ? client.id : client) +
+    'unsubscribed to topics: ' + subscriptions.join('\n') + ' from broker ' + aedes.id);
 });
 
 // fired when a client connects
 aedes.on('client', function (client) {
-	Logger.log('Client Connected: ' + (client ? client.id : client) + ' to broker ' + aedes.id);
+  Logger.log('Client Connected: ' + (client ? client.id : client) + ' to broker ' + aedes.id);
 });
 
 // fired when a client disconnects
 aedes.on('clientDisconnect', function (client) {
-	Logger.log('Client Disconnected: ' + (client ? client.id : client) + ' to broker ' + aedes.id);
+  Logger.log('Client Disconnected: ' + (client ? client.id : client) + ' to broker ' + aedes.id);
 });
 
 // fired when a message is published
 aedes.on('publish', async function (packet, client) {
-	if (packet.topic == `$SYS/${aedes.id}/heartbeat`) {
-		return;
-	}
-	Logger.log('Client ' + (client ? client.id : aedes.id) + ' has published ' + packet.payload.toString() + 'on ' + packet.topic + ' to broker ' + aedes.id);
+  if (packet.topic == `$SYS/${aedes.id}/heartbeat`) {
+    return;
+  }
+  //Logger.log('Client ' + (client ? client.id : aedes.id) + ' has published ' + packet.payload.toString() + 'on ' + packet.topic + ' to broker ' + aedes.id);
 });

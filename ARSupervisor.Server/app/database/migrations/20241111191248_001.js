@@ -9,6 +9,7 @@ exports.up = function (knex) {
         .primary();
       table.string('name', 255)
       table.string('description', 255)
+      table.string('measurement_unit', 255)
     })
     .createTable('assetsSessions', function (table) {
       table.string('id', 50)
