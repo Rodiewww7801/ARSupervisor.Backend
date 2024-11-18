@@ -16,6 +16,8 @@ const BACKEND_URL = config.BACKEND_URL;
 
 
 aedes.authenticate = async (client, username, password, callback) => {
+  const error = new Error('Not authorized');
+  error.returnCode = 135;
   try {
     const response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
       email: username,
@@ -30,11 +32,12 @@ aedes.authenticate = async (client, username, password, callback) => {
     if (response.status == 200) {
       callback(null, true);
     } else {
-      callback(new Error('Authentification failed'), false);
+      Logger.logError("hello");
+      callback(error, null);
     }
   } catch (err) {
     Logger.logError(`${err}`)
-    callback(new Error(err.message), false);
+    callback(error, null);
   }
 }
 

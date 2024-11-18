@@ -2,7 +2,8 @@ const dotenv = require("dotenv");
 
 if (process.env.NODE_ENV) {
 	const configFile = `./.env.${process.env.NODE_ENV}`;
-	dotenv.config({ path: configFile });
+	const result = dotenv.config({ path: configFile });
+    console.log(result);
 } else {
 	dotenv.config();
 }

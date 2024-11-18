@@ -1,7 +1,7 @@
 const authRoutes = require('./auth/authRoutes.js');
-const secretRoutes = require('./secret/secretRoutes.js');
+const assetRoutes = require('./asset/assetRoutes.js');
 
 module.exports = {
-	authRoutes,
-	secretRoutes
+  authRoutes,
+  assetRoutes
 }

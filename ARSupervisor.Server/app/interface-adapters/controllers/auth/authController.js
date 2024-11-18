@@ -1,4 +1,4 @@
-const Logger = require('../../../helpers/logger.js')
+const Logger = require('../../../helpers/logger.js');
 const { UnsupportedClient } = require("../../../domain-services/errors/index.js");
 const { UserAllreadyExist, UserDosentExist } = require("../../../domain/errors/index.js");
 const { ValidationError, HTTPError } = require("../../errors/index.js");

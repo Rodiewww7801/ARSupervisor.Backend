@@ -30,42 +30,12 @@ async function registerClient() {
   }
 }
 
-async function loginClient() {
-  try {
-    response = await axios.post(`${BACKEND_URL}/api/auth/login`, {
-      email: email,
-      password: password
-    }, {
-      headers: {
-        'Client': clientId,
-        'Content-Type': 'application/json',
-      }
-    });
-    Logger.log(`successfully login client with message: ${response?.data?.message}`)
-  } catch (err) {
-    const message = err?.response?.data?.message || err.message;
-    Logger.logError(`failed to login request with message: ${message}`);
-    throw err
-  }
-}
-
 async function start() {
-  try {
-    await loginClient();
-  } catch {
-    Logger.log(`try to register client '${clientId}'`);
-    try {
-      await registerClient();
-      await loginClient();
-    } catch {
-      Logger.logError(`failed to authentifacate client '${clientId} execute with error'`);
-      return
-    }
-  }
   const client = mqtt.connect(`ws://${HOST}:${PORT}`, {
     username: email,
     password: password,
     clientId: clientId,
+    reconnectPeriod: 0,
   });
 
   client.on('connect', function () {
@@ -77,6 +47,13 @@ async function start() {
 
   client.on('error', (err) => {
     Logger.logError(`${err}`);
+    if (err.code === 135 || err.message.includes('Not authorized')) {
+      client.end();
+      registerClient()
+        .then(() => {
+          start();
+        });
+    }
   });
 }
 

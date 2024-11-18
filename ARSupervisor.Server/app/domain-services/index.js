@@ -1,19 +1,29 @@
 function bootstraper() {
-	const passwordServiceFactory = require('./services/userSessions/passwordService.js');
-	const tokenServiceFactory = require('./services/userSessions/tokenService.js');
-	const userSessionServiceFactory = require('./services/userSessions/userSessionService.js');
-	
-	const { User, UserSession, Client, Role } = require('../domain/index.js');
+  const passwordServiceFactory = require('./services/userSessions/passwordService.js');
+  const tokenServiceFactory = require('./services/userSessions/tokenService.js');
+  const userSessionServiceFactory = require('./services/userSessions/userSessionService.js');
+  const assetsSessionServcieFactory = require('./services/assetsSession/assetsSessionService.js');
 
-	const passwordService = passwordServiceFactory();
-	const tokenService = tokenServiceFactory();
-	const userSessionService = userSessionServiceFactory(User, UserSession, Client, Role, tokenService);
+  const {
+    User,
+    UserSession,
+    Client,
+    Role,
+    Asset,
+    AssetsSession,
+  } = require('../domain/index.js');
 
-	return {
-		passwordService,
-		userSessionService,
-		tokenService
-	};
+  const passwordService = passwordServiceFactory();
+  const tokenService = tokenServiceFactory();
+  const userSessionService = userSessionServiceFactory(User, UserSession, Client, Role, tokenService);
+  const assetsSessionService = assetsSessionServcieFactory(Asset, AssetsSession, UserSession);
+
+  return {
+    passwordService,
+    userSessionService,
+    tokenService,
+    assetsSessionService,
+  };
 }
 
 module.exports = bootstraper();
