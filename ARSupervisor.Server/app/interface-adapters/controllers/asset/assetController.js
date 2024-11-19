@@ -48,7 +48,7 @@ function assetController(assetsSessionService) {
 
   async function handleCreateAssetsSession(req, res, assetsSessionId) {
     try {
-      let accessToken = req.body.accessToken || req.cookies.accessToken;;
+      let accessToken = req.cookies?.accessToken || req.body?.accessToken;
       if (!accessToken) {
         throw new ValidationError();
       }

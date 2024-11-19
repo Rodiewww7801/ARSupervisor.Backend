@@ -54,7 +54,7 @@ function authController(userSessionService) {
   async function handleRefresh(req, res) {
     try {
       const clientId = req.header('Client');
-      let refreshToken = req.body.refreshToken || req.cookies.refreshToken;;
+      let refreshToken = req.cookies?.refreshToken || req.body?.refreshToken;
       if (!refreshToken) {
         throw new ValidationError(400, 'Refresh token required')
       }
