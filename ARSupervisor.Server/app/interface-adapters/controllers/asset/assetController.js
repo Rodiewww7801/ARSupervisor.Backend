@@ -46,6 +46,27 @@ function assetController(assetsSessionService) {
     }
   }
 
+  async function handleGetAssets(req, res) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+      const [assets, total] = await assetsSessionService.getAssets(offset, limit);
+      res.json({
+        data: assets,
+        meta: {
+          total: total.total,
+          curentPage: page,
+          totalPages: Math.ceil(total.total / limit),
+          pageSize: limit,
+        },
+      })
+    } catch (err) {
+      Logger.logError(`handleGetAsset: ${err}`)
+      handleError(err, res)
+    }
+  }
+
   async function handleCreateAssetsSession(req, res, assetsSessionId) {
     try {
       let accessToken = req.cookies?.accessToken || req.body?.accessToken;
@@ -100,6 +121,7 @@ function assetController(assetsSessionService) {
   return Object.freeze({
     handleAddAsset,
     handleGetAsset,
+    handleGetAssets,
     handleAddAssetToSession,
     handleCreateAssetsSession,
     handleGetAssetsSession,

@@ -28,10 +28,24 @@ function Asset(assetRepository) {
     };
   }
 
+  async function getAssets(offset, limit) {
+    let [assets, total] = await assetRepository.getAssets(offset, limit);
+    assets = assets.map((asset) => {
+      return {
+        id: asset.id,
+        name: asset.name,
+        description: asset.description,
+        measurement_unit: asset.measurement_unit
+      };
+    });
+    return [assets, total];
+  }
+
 
   return {
     addAsset,
     getAssetById,
+    getAssets,
   };
 }
 

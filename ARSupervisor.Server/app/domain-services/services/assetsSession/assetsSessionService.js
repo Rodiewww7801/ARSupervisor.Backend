@@ -17,6 +17,13 @@ function assetsSessionService(Asset, AssetsSession, UserSession) {
     return asset;
   }
 
+  async function getAssets(offset, limit) {
+    if (!(offset >= 0 || limit > 0)) {
+      return [null, 0];
+    }
+    return await Asset.getAssets(offset, limit);
+  }
+
   async function createAssetsSession(assetsSessionId, accessToken) {
     if (!accessToken) {
       throw new ValidationError();
@@ -61,6 +68,7 @@ function assetsSessionService(Asset, AssetsSession, UserSession) {
     addAssetToSession,
     addAsset,
     getAssetById,
+    getAssets,
     deleteAssetFromSession
   });
 }

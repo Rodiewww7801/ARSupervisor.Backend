@@ -24,5 +24,10 @@ router.delete(`${apiRoute}/:assetId/session/:assetsSessionId`, auth, (req, res) 
   assetController.handleDeleteAssetFromSession(req, res, req.params.assetId, req.params.assetsSessionId)
 });
 
+// GET http://localhost:8080/assets?page=2&limit=5
+router.get(`/api/assets`, auth, (req, res) => {
+  assetController.handleGetAssets(req, res)
+});
+
 module.exports = router;
 

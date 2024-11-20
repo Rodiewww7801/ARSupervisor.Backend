@@ -35,10 +35,18 @@ function repository() {
     }
   }
 
-  async function getAllAssets() {
+  async function getAssets(offset, limit) {
     try {
-      return await knex('assets')
-        .returning('*');
+      const [assets, total] = await Promise.all([
+        knex('assets')
+          .select('*')
+          .limit(limit)
+          .offset(offset),
+        knex('assets')
+          .count('id as total')
+          .first()
+      ]);
+      return [assets, total];
     } catch (err) {
       throw DatabaseError(err)
     }
@@ -47,7 +55,7 @@ function repository() {
   return Object.freeze({
     addAsset,
     getAssetById,
-    getAllAssets
+    getAssets,
   });
 }
 
