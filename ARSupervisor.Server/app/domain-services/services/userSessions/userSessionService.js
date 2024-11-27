@@ -48,11 +48,11 @@ function userSessionService(User, UserSession, Client, Role, tokenService) {
 
   async function refreshUserSession(refreshToken, clientId) {
     if (!refreshToken) {
-      throw new ValidationError()
+      throw new ValidationError();
     }
     const isClientExist = await Client.getClientById(clientId);
     if (!isClientExist) {
-      throw new UnsupportedClient()
+      throw new UnsupportedClient();
     }
     const decodedJWT = await tokenService.verifyTokenSign(refreshToken)
     if (decodedJWT.clientId != clientId) {

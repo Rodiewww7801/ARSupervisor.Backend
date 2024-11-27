@@ -38,12 +38,15 @@ function authController(userSessionService) {
       const userSession = await userSessionService.loginUser(email, password, clientId);
       if (process.nativeApps.includes(userSession.clientId)) {
         res.status(200).json({
+          userId: userSession.userId,
           accessToken: userSession.accessToken,
           refreshToken: userSession.refreshToken
         });
       } else {
         setUserSessionToCookie(res, userSession)
-        res.status(200).json({ message: 'Authenticated successfully' });
+        res.status(200).json({
+          userId: userSession.userId,
+        });
       }
     } catch (err) {
       Logger.logError(`handleLogin: ${err}`)

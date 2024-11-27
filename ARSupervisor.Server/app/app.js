@@ -3,7 +3,7 @@ const Logger = require('./helpers/logger.js')
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const { getIPAddress } = require('./helpers/index.js');
-const { authRoutes, assetRoutes } = require('./routes/index.js');
+const { authRoutes, assetRoutes, userRoutes } = require('./routes/index.js');
 const requestLogger = require('./interface-adapters/middleware/requestLogger.js')
 require('./database/database.js')
 
@@ -17,6 +17,7 @@ app.use(cookieParser());
 app.use(requestLogger);
 app.use(authRoutes);
 app.use(assetRoutes);
+app.use(userRoutes);
 
 app.listen(PORT, () => {
   const IPv4 = getIPAddress();
