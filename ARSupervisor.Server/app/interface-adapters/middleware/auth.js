@@ -13,7 +13,7 @@ function handleError(err, res) {
 
 async function auth(req, res, next) {
   try {
-    let accessToken = req.cookies?.accessToken || req.body?.accessToken;
+    let accessToken = req.cookies?.accessToken || req.headers?.authorization;
     if (!accessToken) {
       throw new ValidationError(401, 'Access token required');
     }
