@@ -35,16 +35,22 @@ function repository() {
     }
   }
 
-  async function getAssets(offset, limit) {
+  async function getAssets(name, offset, limit) {
     try {
+      let query = knex('assets')
+        .select('*')
+        .limit(limit)
+        .offset(offset);
+      let queryTotal = knex('assets').count('id as total')
+
+      if (name) {
+        query.where('name', 'ILIKE', `%${name}%`);
+        queryTotal.where('name', 'ILIKE', `%${name}%`);
+      }
+
       const [assets, total] = await Promise.all([
-        knex('assets')
-          .select('*')
-          .limit(limit)
-          .offset(offset),
-        knex('assets')
-          .count('id as total')
-          .first()
+        query,
+        queryTotal.first(),
       ]);
       return [assets, total];
     } catch (err) {

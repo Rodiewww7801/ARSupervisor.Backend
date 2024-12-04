@@ -48,17 +48,18 @@ function assetController(assetsSessionService) {
 
   async function handleGetAssets(req, res) {
     try {
+      const name = req.query?.search || null;
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10;
       const offset = (page - 1) * limit;
-      const [assets, total] = await assetsSessionService.getAssets(offset, limit);
+      const [assets, total] = await assetsSessionService.getAssets(name, offset, limit);
       res.json({
         data: assets,
         meta: {
           total: total.total,
           curentPage: page,
           totalPages: Math.ceil(total.total / limit),
-          pageSize: limit,
+          pageLimit: limit,
         },
       })
     } catch (err) {

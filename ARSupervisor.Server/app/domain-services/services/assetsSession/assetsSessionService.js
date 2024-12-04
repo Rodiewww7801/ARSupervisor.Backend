@@ -17,11 +17,11 @@ function assetsSessionService(Asset, AssetsSession, UserSession) {
     return asset;
   }
 
-  async function getAssets(offset, limit) {
+  async function getAssets(name, offset, limit) {
     if (!(offset >= 0 || limit > 0)) {
       return [null, 0];
     }
-    return await Asset.getAssets(offset, limit);
+    return await Asset.getAssets(name, offset, limit);
   }
 
   async function createAssetsSession(assetsSessionId, accessToken) {
