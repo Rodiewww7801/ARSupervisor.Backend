@@ -28,7 +28,6 @@ function userController(userService) {
       res.status(200).json({
         id: userInfo.id,
         email: userInfo.email,
-        imageURL: userInfo?.imageURL || null,
         firstName: userInfo?.firstName || null,
         lastName: userInfo?.lastName || null,
         role: userInfo.role,
@@ -39,8 +38,48 @@ function userController(userService) {
     }
   }
 
+  async function handleGetUserImage(req, res, userId) {
+    try {
+      if (!userId) {
+        throw new ValidationError();
+      }
+      const image = await userService.getUserImage(userId);
+      if (!image) {
+        return res.status(404).send('Image not found');
+      }
+      res.set('Content-Type', image.mimetype);
+      res.send(image.image);
+    } catch (err) {
+      Logger.logError(`handleGetUserInfo: ${err}`)
+      handleError(err, res)
+    }
+  }
+
+  async function handleAddUserImage(req, res, userId) {
+    try {
+      if (!userId) {
+        throw new ValidationError();
+      }
+      const mimetype = req.headers['content-type'];
+      if (!mimetype) {
+        return res.status(400).send('Content-type is empty');
+      }
+      if (!mimetype.startsWith('image/')) {
+        return res.status(400).json({ error: 'Only image files are allowed' });
+      }
+      const imageFile = { buffer: req.body, mimetype: mimetype }
+      await userService.addUserImage(userId, imageFile);
+      res.status(200).send('Image successfully added');
+    } catch (err) {
+      Logger.logError(`handleGetUserInfo: ${err}`)
+      handleError(err, res)
+    }
+  }
+
   return Object.freeze({
-    handleGetUserInfo
+    handleGetUserInfo,
+    handleGetUserImage,
+    handleAddUserImage,
   });
 }
 

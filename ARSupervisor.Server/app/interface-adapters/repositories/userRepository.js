@@ -46,10 +46,42 @@ function repository() {
     }
   }
 
+  async function getUserImage(id) {
+    try {
+      return await knex('userImages')
+        .where({
+          userId: id
+        })
+        .returning('*')
+        .then(rows => rows[0]);
+    } catch (err) {
+      throw new DatabaseError(err.message);
+    }
+  }
+
+  async function addUserImage(userId, imageFile) {
+    try {
+      return await knex('userImages')
+        .insert({
+          id: imageFile.id,
+          image: imageFile.buffer,
+          mimetype: imageFile.mimetype,
+          userId: userId,
+        })
+        .onConflict(['userId'])
+        .merge()
+        .returning('id');
+    } catch (err) {
+      throw new DatabaseError(err.message);
+    }
+  }
+
   return Object.freeze({
     addUser,
     getUserByEmail,
     getUserById,
+    getUserImage,
+    addUserImage,
   })
 }
 

@@ -2,10 +2,6 @@ const { ValidationError } = require('../../errors/index.js');
 
 function userService(User, Role) {
   async function getUserInfoById(id) {
-    if (!id) {
-      throw new ValidationError()
-    }
-
     const user = await User.getUserById(id);
     if (!user) {
       throw new ValidationError()
@@ -14,15 +10,28 @@ function userService(User, Role) {
     return {
       id: user.id,
       email: user.email,
-      imageURL: user?.imageURL || null,
       firstName: user?.firstName || null,
       lastName: user?.lastName || null,
       role: userRole?.role || null,
     };
   }
 
+  async function getUserImage(id) {
+    const image = await User.getUserImage(id);
+    return image
+  }
+
+  async function addUserImage(userId, imageFile) {
+    if (!userId, !imageFile) {
+      throw new ValidationError()
+    }
+    await User.addUserImage(userId, imageFile);
+  }
+
   return Object.freeze({
     getUserInfoById,
+    getUserImage,
+    addUserImage,
   });
 }
 

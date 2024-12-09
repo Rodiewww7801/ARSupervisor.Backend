@@ -1,4 +1,4 @@
-const { UserAllreadyExist, UserDosentExist } = require('../errors/index.js');
+const { UserAllreadyExist, UserDosentExist, DomainError } = require('../errors/index.js');
 
 function User(userRepository, passwordService) {
   async function createUser(email, password) {
@@ -43,6 +43,34 @@ function User(userRepository, passwordService) {
     };
   }
 
+  async function getUserImage(id) {
+    const user = await userRepository.getUserById(id);
+    if (!user) {
+      throw new UserDosentExist(id);
+    }
+    const image = await userRepository.getUserImage(id);
+    if (!image) {
+      return null;
+    }
+    return {
+      image: image.image,
+      mimetype: image.mimetype,
+    }
+  }
+
+  async function addUserImage(userId, imageFile) {
+    const user = await userRepository.getUserById(userId);
+    if (!user) {
+      throw new UserDosentExist(userId);
+    }
+    let id = crypto.randomUUID().toString();
+    const success = await userRepository.addUserImage(userId, { id, ...imageFile });
+    if (!success) {
+      throw new DomainError('Failed to load image to database')
+    }
+  }
+
+
   async function verifyPassword(password, hashedPassword) {
     const verifiedPassword = await passwordService.verifyPassword(password, hashedPassword)
     return verifiedPassword
@@ -52,7 +80,9 @@ function User(userRepository, passwordService) {
     createUser,
     getUserByEmail,
     getUserById,
-    verifyPassword
+    verifyPassword,
+    getUserImage,
+    addUserImage,
   }
 }
 
